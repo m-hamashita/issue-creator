@@ -1,4 +1,5 @@
-//+build wireinject
+//go:build wireinject
+// +build wireinject
 
 package cmd
 
@@ -54,6 +55,7 @@ func NewIssueService(cfg Config, issueRepo repo.Repository, ct time.Time) issue.
 		ct,
 		cfg.CloseLastIssue,
 		cfg.CheckBeforeCreateIssue,
+		cfg.OverrideTitle,
 	)
 }
 

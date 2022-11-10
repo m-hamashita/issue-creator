@@ -31,14 +31,16 @@ type issueServiceImpl struct {
 	ct                     time.Time
 	closeLastIssue         bool
 	checkBeforeCreateIssue *string
+	overrideTitle          string
 }
 
-func NewIssueService(issueRepository repo.Repository, currentTime time.Time, closeLastIssue bool, checkBeforeCreateIssue *string) IssueService {
+func NewIssueService(issueRepository repo.Repository, currentTime time.Time, closeLastIssue bool, checkBeforeCreateIssue *string, overrideTitle string) IssueService {
 	return &issueServiceImpl{
 		ir:                     issueRepository,
 		ct:                     currentTime,
 		closeLastIssue:         closeLastIssue,
 		checkBeforeCreateIssue: checkBeforeCreateIssue,
+		overrideTitle:          overrideTitle,
 	}
 }
 
@@ -81,6 +83,9 @@ func (is *issueServiceImpl) render(ctx context.Context, templateIssueURL string)
 		return types.Issue{}, errors.Wrap(err, "Failed to render title")
 	}
 	title := string(tw.Bytes())
+	if is.overrideTitle != "" {
+		title = is.overrideTitle
+	}
 
 	bw := bytes.NewBufferString("")
 	err = bodyTmpl.Execute(bw, TemplateData{CurrentTime: is.ct, LastIssue: lastIssue, AddDay: func(d int) time.Time { return is.ct.AddDate(0, 0, d) }})
